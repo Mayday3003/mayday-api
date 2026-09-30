@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { createAuthRouter } from './interface/routes/authRoutes.js';
+import { createExperienceRouter } from './interface/routes/experienceRoutes.js';
+import { createInteractionRouter } from './interface/routes/interactionRoutes.js';
 import { errorHandler } from './interface/middlewares/errorMiddleware.js';
 
 const app = express();
@@ -29,8 +31,10 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// Rutas de Autenticación
+// Rutas de la API REST
 app.use('/api/auth', createAuthRouter());
+app.use('/api/experiencias', createExperienceRouter());
+app.use('/api/interacciones', createInteractionRouter());
 
 // Manejador global de errores (siempre al final de las rutas)
 app.use(errorHandler);
