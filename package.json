@@ -15,7 +15,15 @@
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
-  "keywords": ["express", "typescript", "prisma", "postgresql", "jwt", "rest-api", "mayday"],
+  "keywords": [
+    "express",
+    "typescript",
+    "prisma",
+    "postgresql",
+    "jwt",
+    "rest-api",
+    "mayday"
+  ],
   "author": "Mariana Lopera <mayday>",
   "license": "ISC",
   "dependencies": {
@@ -25,6 +33,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "resend": "^6.32.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

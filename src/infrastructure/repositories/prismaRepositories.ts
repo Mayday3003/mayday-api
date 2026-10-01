@@ -36,6 +36,17 @@ export class PrismaUserRepository implements IUserRepository {
       role: created.role as UserRole,
     };
   }
+
+  async updatePassword(id: string, newPasswordHash: string): Promise<UserEntity> {
+    const updated = await prisma.user.update({
+      where: { id },
+      data: { password: newPasswordHash },
+    });
+    return {
+      ...updated,
+      role: updated.role as UserRole,
+    };
+  }
 }
 
 export class PrismaExperienceRepository implements IExperienceRepository {

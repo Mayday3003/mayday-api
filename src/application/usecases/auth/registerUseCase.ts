@@ -2,6 +2,7 @@ import { IUserRepository } from '../../../domain/repositories/index.js';
 import { RegisterDto, AuthResponseDto } from '../../../domain/dtos/index.js';
 import { ConflictError, AppError } from '../../../domain/entities/errors.js';
 import { PasswordService, TokenService } from '../../../infrastructure/services/security.js';
+import { EmailService } from '../../../infrastructure/services/emailService.js';
 
 export class RegisterUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -45,7 +46,12 @@ export class RegisterUseCase {
       role: user.role,
     });
 
-    // 6. Responder sin incluir la contraseña bajo ningún motivo
+    // 6. Enviar correo de bienvenida transaccional en segundo plano
+    EmailService.sendWelcomeEmail(user.name, user.email).catch((err) => {
+      console.error('Error enviando correo de bienvenida:', err);
+    });
+
+    // 7. Responder sin incluir la contraseña bajo ningún motivo
     return {
       token,
       user: {
