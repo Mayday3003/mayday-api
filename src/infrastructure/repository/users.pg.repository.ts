@@ -1,5 +1,5 @@
-import { IUserRepository } from '../../domain/repositories/index.js';
-import { UserEntity, UserRole } from '../../domain/entities/index.js';
+import type { IUserRepository } from '../../domain/repository/IUser.repository.js';
+import type { UserEntity, UserRole } from '../../domain/models/User.js';
 import prisma from './client.js';
 
 export class UserPgRepository implements IUserRepository {

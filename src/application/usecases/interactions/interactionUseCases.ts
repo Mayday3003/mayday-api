@@ -1,6 +1,6 @@
-import { IInteractionRepository, IExperienceRepository } from '../../../domain/repositories/index.js';
-import { InteractionEntity } from '../../../domain/entities/index.js';
-import { CreateInteractionDto } from '../../../domain/dtos/index.js';
+import type { IInteractionRepository } from '../../../domain/repository/IInteraction.repository.js';
+import type { IExperienceRepository } from '../../../domain/repository/IExperience.repository.js';
+import type { InteractionEntity, CreateInteractionDto } from '../../../domain/models/Interaction.js';
 import { NotFoundError, AppError } from '../../../domain/entities/errors.js';
 
 export class CreateInteractionUseCase {

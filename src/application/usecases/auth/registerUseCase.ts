@@ -1,5 +1,5 @@
-import { IUserRepository } from '../../../domain/repositories/index.js';
-import { RegisterDto, AuthResponseDto } from '../../../domain/dtos/index.js';
+import type { IUserRepository } from '../../../domain/repository/IUser.repository.js';
+import type { RegisterDto, AuthResponseDto } from '../../../domain/models/User.js';
 import { ConflictError, AppError } from '../../../domain/entities/errors.js';
 import { BcryptService } from '../../../infrastructure/services/bcrypt.service.js';
 import { JwtService } from '../../../infrastructure/services/jwt.service.js';

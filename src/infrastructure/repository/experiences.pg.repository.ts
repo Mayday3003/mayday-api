@@ -1,6 +1,6 @@
-import { IExperienceRepository } from '../../domain/repositories/index.js';
-import { ExperienceEntity, ExperienceCategory } from '../../domain/entities/index.js';
-import { CreateExperienceDto, UpdateExperienceDto, PaginatedResult } from '../../domain/dtos/index.js';
+import type { IExperienceRepository } from '../../domain/repository/IExperience.repository.js';
+import type { ExperienceEntity, ExperienceCategory, CreateExperienceDto, UpdateExperienceDto } from '../../domain/models/Experience.js';
+import type { PaginatedResult } from '../../domain/models/Pagination.js';
 import prisma from './client.js';
 
 export class ExperiencePgRepository implements IExperienceRepository {

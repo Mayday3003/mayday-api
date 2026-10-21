@@ -3,7 +3,7 @@ import { JwtService } from '../../infrastructure/services/jwt.service.js';
 
 const jwtService = new JwtService();
 import { UnauthorizedError, ForbiddenError } from '../../domain/entities/errors.js';
-import { UserRole } from '../../domain/entities/index.js';
+import type { UserRole } from '../../domain/models/User.js';
 
 // Extender la interfaz Request de Express para adjuntar el usuario decodificado
 declare global {

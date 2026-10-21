@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { JwtPayloadDto } from '../../domain/dtos/index.js';
+import type { JwtPayloadDto } from '../../domain/models/User.js';
 
 export class JwtService {
   private getSecret(): string {

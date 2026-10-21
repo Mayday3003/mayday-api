@@ -1,6 +1,6 @@
-import { IExperienceRepository } from '../../../domain/repositories/index.js';
-import { ExperienceEntity } from '../../../domain/entities/index.js';
-import { CreateExperienceDto, UpdateExperienceDto, PaginatedResult } from '../../../domain/dtos/index.js';
+import type { IExperienceRepository } from '../../../domain/repository/IExperience.repository.js';
+import type { ExperienceEntity, CreateExperienceDto, UpdateExperienceDto } from '../../../domain/models/Experience.js';
+import type { PaginatedResult } from '../../../domain/models/Pagination.js';
 import { NotFoundError, AppError } from '../../../domain/entities/errors.js';
 
 export class GetExperiencesUseCase {

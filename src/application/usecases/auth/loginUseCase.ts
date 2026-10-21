@@ -1,5 +1,5 @@
-import { IUserRepository } from '../../../domain/repositories/index.js';
-import { LoginDto, AuthResponseDto } from '../../../domain/dtos/index.js';
+import type { IUserRepository } from '../../../domain/repository/IUser.repository.js';
+import type { LoginDto, AuthResponseDto } from '../../../domain/models/User.js';
 import { UnauthorizedError, AppError } from '../../../domain/entities/errors.js';
 import { BcryptService } from '../../../infrastructure/services/bcrypt.service.js';
 import { JwtService } from '../../../infrastructure/services/jwt.service.js';

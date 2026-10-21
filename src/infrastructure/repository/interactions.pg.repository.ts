@@ -1,5 +1,7 @@
-import { IInteractionRepository } from '../../domain/repositories/index.js';
-import { InteractionEntity, UserRole, ExperienceCategory } from '../../domain/entities/index.js';
+import type { IInteractionRepository } from '../../domain/repository/IInteraction.repository.js';
+import type { InteractionEntity } from '../../domain/models/Interaction.js';
+import type { UserRole } from '../../domain/models/User.js';
+import type { ExperienceCategory } from '../../domain/models/Experience.js';
 import prisma from './client.js';
 
 export class InteractionPgRepository implements IInteractionRepository {
