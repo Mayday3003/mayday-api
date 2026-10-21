@@ -20,9 +20,3 @@ export interface InteractionEntity {
   createdAt: Date;
   updatedAt: Date;
 }
-
-export interface CreateInteractionDto {
-  content: string;
-  experienceId: string;
-  userId: string; // Proviene siempre del token verificado
-}

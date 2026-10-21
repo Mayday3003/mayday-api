@@ -1,8 +1,9 @@
 import type { IUserRepository } from '../domain/repository/IUser.repository.js';
-import type { AuthResponseDto, LoginDto, PublicUser, RegisterDto, UserEntity } from '../domain/models/User.js';
+import type { AuthResponseDto, PublicUser, UserEntity } from '../domain/models/User.js';
 import type { BcryptService } from '../infrastructure/services/bcrypt.service.js';
 import type { JwtService } from '../infrastructure/services/jwt.service.js';
 import { EmailService } from '../infrastructure/services/email.service.js';
+import { LoginUserDto, RegisterUserDto } from '../infrastructure/dtos/auth.dto.js';
 import { BadRequestError } from './errors/bad-request.error.js';
 import { UnauthorizedError } from './errors/unauthorized.error.js';
 import { ConflictError } from './errors/conflict.error.js';
@@ -20,24 +21,13 @@ export class AuthUseCase {
     private readonly jwtService: JwtService
   ) {}
 
-  async register(dto: RegisterDto): Promise<AuthResponseDto> {
-    // 1. Validaciones básicas de entrada
-    if (!dto.name || dto.name.trim().length < 2) {
-      throw new BadRequestError('El nombre debe tener al menos 2 caracteres');
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!dto.email || !emailRegex.test(dto.email)) {
-      throw new BadRequestError('Ingresa un correo electrónico válido');
-    }
-
-    if (!dto.password || dto.password.length < 6) {
-      throw new BadRequestError('La contraseña debe tener al menos 6 caracteres');
-    }
+  async register(payload: Record<string, unknown>): Promise<AuthResponseDto> {
+    // 1. Validar con el DTO (400 con el error de cada campo)
+    const dto = new RegisterUserDto(payload);
+    await dto.validateDto();
 
     // 2. Comprobar si el email ya existe (409 Conflict obligatorio por rúbrica)
-    const normalizedEmail = dto.email.toLowerCase().trim();
-    const existingUser = await this.userRepository.findByEmail(normalizedEmail);
+    const existingUser = await this.userRepository.findByEmail(dto.email);
     if (existingUser) {
       throw new ConflictError('Ya existe una cuenta registrada con este correo electrónico');
     }
@@ -47,8 +37,8 @@ export class AuthUseCase {
 
     // 4. Crear usuario en la base de datos (por defecto rol 'user')
     const user = await this.userRepository.create({
-      name: dto.name.trim(),
-      email: normalizedEmail,
+      name: dto.name,
+      email: dto.email,
       password: hashedPassword,
       role: 'user',
     });
@@ -64,13 +54,11 @@ export class AuthUseCase {
     return { token, user: toPublicUser(user) };
   }
 
-  async login(dto: LoginDto): Promise<AuthResponseDto> {
-    if (!dto.email || !dto.password) {
-      throw new BadRequestError('El correo y la contraseña son obligatorios');
-    }
+  async login(payload: Record<string, unknown>): Promise<AuthResponseDto> {
+    const dto = new LoginUserDto(payload);
+    await dto.validateDto();
 
-    const normalizedEmail = dto.email.toLowerCase().trim();
-    const user = await this.userRepository.findByEmail(normalizedEmail);
+    const user = await this.userRepository.findByEmail(dto.email);
 
     // Mensaje genérico obligatorio por rúbrica: NO revelar si falló el email o la contraseña
     const genericAuthError = new UnauthorizedError('Credenciales inválidas. Verifica tu correo y contraseña.');

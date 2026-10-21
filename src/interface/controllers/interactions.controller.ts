@@ -11,14 +11,8 @@ export class InteractionsController {
         throw new UnauthorizedError('Debes iniciar sesión para publicar un recuerdo');
       }
 
-      const { content, experienceId } = req.body;
-
       // REGLA DE ORO DE LA RÚBRICA: El userId se toma estrictamente del token verificado (req.user.id), NUNCA del body
-      const result = await this.interactionsUseCase.create({
-        content,
-        experienceId,
-        userId: req.user.id,
-      });
+      const result = await this.interactionsUseCase.create(req.body ?? {}, req.user.id);
 
       res.status(201).json(result);
     } catch (error) {

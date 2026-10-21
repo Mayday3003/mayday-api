@@ -1,7 +1,7 @@
 import type { IExperienceRepository } from '../domain/repository/IExperience.repository.js';
-import type { CreateExperienceDto, ExperienceEntity, UpdateExperienceDto } from '../domain/models/Experience.js';
+import type { ExperienceEntity } from '../domain/models/Experience.js';
 import type { PaginatedResult } from '../domain/models/Pagination.js';
-import { BadRequestError } from './errors/bad-request.error.js';
+import { CreateExperienceBodyDto, UpdateExperienceBodyDto } from '../infrastructure/dtos/experience.dto.js';
 import { NotFoundError } from './errors/not-found.error.js';
 
 export class ExperiencesUseCase {
@@ -21,21 +21,15 @@ export class ExperiencesUseCase {
     return experience;
   }
 
-  async create(dto: CreateExperienceDto): Promise<ExperienceEntity> {
-    if (!dto.title || dto.title.trim().length < 3) {
-      throw new BadRequestError('El título debe tener al menos 3 caracteres');
-    }
-    if (!dto.description || dto.description.trim().length < 10) {
-      throw new BadRequestError('La descripción debe tener al menos 10 caracteres');
-    }
-    if (!['viaje', 'situacion', 'experiencia'].includes(dto.type)) {
-      throw new BadRequestError('El tipo debe ser: viaje, situacion o experiencia');
-    }
-
+  async create(payload: Record<string, unknown>): Promise<ExperienceEntity> {
+    const dto = new CreateExperienceBodyDto(payload);
+    await dto.validateDto();
     return this.experienceRepository.create(dto);
   }
 
-  async update(id: string, dto: UpdateExperienceDto): Promise<ExperienceEntity> {
+  async update(id: string, payload: Record<string, unknown>): Promise<ExperienceEntity> {
+    const dto = new UpdateExperienceBodyDto(payload);
+    await dto.validateDto();
     await this.getById(id);
     return this.experienceRepository.update(id, dto);
   }
