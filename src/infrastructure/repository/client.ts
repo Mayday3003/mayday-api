@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
+// Único punto del proyecto que crea el cliente de Prisma (patrón singleton)
 class PrismaSingleton {
   private static instance: PrismaClient;
 
@@ -15,4 +16,6 @@ class PrismaSingleton {
   }
 }
 
-export const prisma = PrismaSingleton.getInstance();
+const prisma = PrismaSingleton.getInstance();
+
+export default prisma;

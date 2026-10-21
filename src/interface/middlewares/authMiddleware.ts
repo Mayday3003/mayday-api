@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { TokenService } from '../../infrastructure/services/security.js';
+import { JwtService } from '../../infrastructure/services/jwt.service.js';
+
+const jwtService = new JwtService();
 import { UnauthorizedError, ForbiddenError } from '../../domain/entities/errors.js';
 import { UserRole } from '../../domain/entities/index.js';
 
@@ -35,7 +37,7 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
   const token = parts[1];
 
   try {
-    const payload = TokenService.verify(token);
+    const payload = jwtService.verify(token);
     req.user = {
       id: payload.id,
       role: payload.role,

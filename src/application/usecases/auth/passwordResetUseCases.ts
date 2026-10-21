@@ -1,7 +1,11 @@
 import { IUserRepository } from '../../../domain/repositories/index.js';
 import { AppError } from '../../../domain/entities/errors.js';
-import { TokenService, PasswordService } from '../../../infrastructure/services/security.js';
-import { EmailService } from '../../../infrastructure/services/emailService.js';
+import { BcryptService } from '../../../infrastructure/services/bcrypt.service.js';
+import { JwtService } from '../../../infrastructure/services/jwt.service.js';
+
+const bcryptService = new BcryptService();
+const jwtService = new JwtService();
+import { EmailService } from '../../../infrastructure/services/email.service.js';
 
 export class RequestPasswordResetUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -20,7 +24,7 @@ export class RequestPasswordResetUseCase {
     }
 
     // Token temporal de 1 hora con tipo reset
-    const resetToken = TokenService.sign({
+    const resetToken = jwtService.sign({
       id: user.id,
       role: user.role,
     });
@@ -46,7 +50,7 @@ export class ResetPasswordUseCase {
 
     let payload;
     try {
-      payload = TokenService.verify(token);
+      payload = jwtService.verify(token);
     } catch (e) {
       throw new AppError('El enlace de recuperación es inválido o ha expirado', 400);
     }
@@ -56,7 +60,7 @@ export class ResetPasswordUseCase {
       throw new AppError('Usuario no encontrado', 404);
     }
 
-    const newHashedPassword = await PasswordService.hash(newPassword);
+    const newHashedPassword = await bcryptService.hash(newPassword);
     await this.userRepository.updatePassword(user.id, newHashedPassword);
 
     return { message: 'Tu contraseña ha sido restablecida exitosamente. Ya puedes iniciar sesión.' };

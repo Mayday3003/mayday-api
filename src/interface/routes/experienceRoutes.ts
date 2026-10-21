@@ -7,13 +7,13 @@ import {
   UpdateExperienceUseCase,
   DeleteExperienceUseCase,
 } from '../../application/usecases/experiences/experienceUseCases.js';
-import { PrismaExperienceRepository } from '../../infrastructure/repositories/prismaRepositories.js';
+import { ExperiencePgRepository } from '../../infrastructure/repository/experiences.pg.repository.js';
 import { authenticate, requireRole } from '../middlewares/authMiddleware.js';
 
 export function createExperienceRouter(): Router {
   const router = Router();
 
-  const repository = new PrismaExperienceRepository();
+  const repository = new ExperiencePgRepository();
   const getExperiencesUseCase = new GetExperiencesUseCase(repository);
   const getExperienceByIdUseCase = new GetExperienceByIdUseCase(repository);
   const createExperienceUseCase = new CreateExperienceUseCase(repository);

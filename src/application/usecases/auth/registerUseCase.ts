@@ -1,8 +1,12 @@
 import { IUserRepository } from '../../../domain/repositories/index.js';
 import { RegisterDto, AuthResponseDto } from '../../../domain/dtos/index.js';
 import { ConflictError, AppError } from '../../../domain/entities/errors.js';
-import { PasswordService, TokenService } from '../../../infrastructure/services/security.js';
-import { EmailService } from '../../../infrastructure/services/emailService.js';
+import { BcryptService } from '../../../infrastructure/services/bcrypt.service.js';
+import { JwtService } from '../../../infrastructure/services/jwt.service.js';
+
+const bcryptService = new BcryptService();
+const jwtService = new JwtService();
+import { EmailService } from '../../../infrastructure/services/email.service.js';
 
 export class RegisterUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -30,7 +34,7 @@ export class RegisterUseCase {
     }
 
     // 3. Hashear la contraseña con bcrypt (nunca en texto plano)
-    const hashedPassword = await PasswordService.hash(dto.password);
+    const hashedPassword = await bcryptService.hash(dto.password);
 
     // 4. Crear usuario en la base de datos (por defecto rol 'user')
     const user = await this.userRepository.create({
@@ -41,7 +45,7 @@ export class RegisterUseCase {
     });
 
     // 5. Emitir JWT firmado con payload mínimo (id y role)
-    const token = TokenService.sign({
+    const token = jwtService.sign({
       id: user.id,
       role: user.role,
     });

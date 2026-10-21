@@ -1,7 +1,11 @@
 import { IUserRepository } from '../../../domain/repositories/index.js';
 import { LoginDto, AuthResponseDto } from '../../../domain/dtos/index.js';
 import { UnauthorizedError, AppError } from '../../../domain/entities/errors.js';
-import { PasswordService, TokenService } from '../../../infrastructure/services/security.js';
+import { BcryptService } from '../../../infrastructure/services/bcrypt.service.js';
+import { JwtService } from '../../../infrastructure/services/jwt.service.js';
+
+const bcryptService = new BcryptService();
+const jwtService = new JwtService();
 
 export class LoginUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -22,13 +26,13 @@ export class LoginUseCase {
     }
 
     // Comparar hash bcrypt con la contraseña enviada
-    const isPasswordValid = await PasswordService.compare(dto.password, user.password);
+    const isPasswordValid = await bcryptService.compare(dto.password, user.password);
     if (!isPasswordValid) {
       throw genericAuthError;
     }
 
     // Emitir JWT firmado con payload mínimo: solo id y role (sin password ni datos sensibles)
-    const token = TokenService.sign({
+    const token = jwtService.sign({
       id: user.id,
       role: user.role,
     });

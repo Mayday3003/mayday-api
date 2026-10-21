@@ -5,17 +5,15 @@ import {
   GetMyInteractionsUseCase,
   GetAllInteractionsUseCase,
 } from '../../application/usecases/interactions/interactionUseCases.js';
-import {
-  PrismaInteractionRepository,
-  PrismaExperienceRepository,
-} from '../../infrastructure/repositories/prismaRepositories.js';
+import { InteractionPgRepository } from '../../infrastructure/repository/interactions.pg.repository.js';
+import { ExperiencePgRepository } from '../../infrastructure/repository/experiences.pg.repository.js';
 import { authenticate, requireRole } from '../middlewares/authMiddleware.js';
 
 export function createInteractionRouter(): Router {
   const router = Router();
 
-  const interactionRepository = new PrismaInteractionRepository();
-  const experienceRepository = new PrismaExperienceRepository();
+  const interactionRepository = new InteractionPgRepository();
+  const experienceRepository = new ExperiencePgRepository();
 
   const createUseCase = new CreateInteractionUseCase(interactionRepository, experienceRepository);
   const getMyUseCase = new GetMyInteractionsUseCase(interactionRepository);

@@ -6,12 +6,12 @@ import {
   RequestPasswordResetUseCase,
   ResetPasswordUseCase,
 } from '../../application/usecases/auth/passwordResetUseCases.js';
-import { PrismaUserRepository } from '../../infrastructure/repositories/prismaRepositories.js';
+import { UserPgRepository } from '../../infrastructure/repository/users.pg.repository.js';
 
 export function createAuthRouter(): Router {
   const router = Router();
 
-  const userRepository = new PrismaUserRepository();
+  const userRepository = new UserPgRepository();
   const registerUseCase = new RegisterUseCase(userRepository);
   const loginUseCase = new LoginUseCase(userRepository);
   const requestPasswordResetUseCase = new RequestPasswordResetUseCase(userRepository);
