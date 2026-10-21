@@ -1,23 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import { RegisterUseCase } from '../../application/usecases/auth/registerUseCase.js';
-import { LoginUseCase } from '../../application/usecases/auth/loginUseCase.js';
-import {
-  RequestPasswordResetUseCase,
-  ResetPasswordUseCase,
-} from '../../application/usecases/auth/passwordResetUseCases.js';
+import { AuthUseCase } from '../../application/auth.use-case.js';
 
 export class AuthController {
-  constructor(
-    private readonly registerUseCase: RegisterUseCase,
-    private readonly loginUseCase: LoginUseCase,
-    private readonly requestPasswordResetUseCase: RequestPasswordResetUseCase,
-    private readonly resetPasswordUseCase: ResetPasswordUseCase
-  ) {}
+  constructor(private readonly authUseCase: AuthUseCase) {}
 
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      // Solo se toman name, email y password: cualquier `role` del body se ignora
       const { name, email, password } = req.body;
-      const result = await this.registerUseCase.execute({ name, email, password });
+      const result = await this.authUseCase.register({ name, email, password });
       res.status(201).json(result);
     } catch (error) {
       next(error);
@@ -27,7 +18,7 @@ export class AuthController {
   login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { email, password } = req.body;
-      const result = await this.loginUseCase.execute({ email, password });
+      const result = await this.authUseCase.login({ email, password });
       res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -37,7 +28,7 @@ export class AuthController {
   forgotPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { email } = req.body;
-      const result = await this.requestPasswordResetUseCase.execute(email);
+      const result = await this.authUseCase.requestPasswordReset(email);
       res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -47,7 +38,7 @@ export class AuthController {
   resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { token, newPassword } = req.body;
-      const result = await this.resetPasswordUseCase.execute(token, newPassword);
+      const result = await this.authUseCase.resetPassword(token, newPassword);
       res.status(200).json(result);
     } catch (error) {
       next(error);

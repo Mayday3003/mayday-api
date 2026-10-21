@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { JwtService } from '../../infrastructure/services/jwt.service.js';
+import { UnauthorizedError } from '../../application/errors/unauthorized.error.js';
+import type { UserRole } from '../../domain/models/User.js';
 
 const jwtService = new JwtService();
-import { UnauthorizedError, ForbiddenError } from '../../domain/entities/errors.js';
-import type { UserRole } from '../../domain/models/User.js';
 
 // Extender la interfaz Request de Express para adjuntar el usuario decodificado
 declare global {
@@ -46,25 +46,4 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
   } catch (error) {
     throw new UnauthorizedError('Token inválido o expirado. Por favor ingresa nuevamente.');
   }
-}
-
-/**
- * Middleware de Autorización por Rol
- * Verifica que el usuario autenticado tenga el rol requerido (ej: 'admin').
- * Si no tiene el rol, responde 403 Forbidden.
- */
-export function requireRole(allowedRoles: UserRole | UserRole[]) {
-  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
-
-  return (req: Request, _res: Response, next: NextFunction): void => {
-    if (!req.user) {
-      throw new UnauthorizedError('Usuario no autenticado');
-    }
-
-    if (!roles.includes(req.user.role)) {
-      throw new ForbiddenError('Acceso denegado: no tienes permisos de administrador para realizar esta acción.');
-    }
-
-    next();
-  };
 }

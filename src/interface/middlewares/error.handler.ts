@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../../domain/entities/errors.js';
 import { Prisma } from '@prisma/client';
+import { AppError } from '../../application/errors/app.error.js';
+import { BadRequestError } from '../../application/errors/bad-request.error.js';
 
 export function errorHandler(
   err: Error,
@@ -8,12 +9,13 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
-  // 1. Errores personalizados de la aplicación (AppError: 400, 401, 403, 404, 409)
+  // 1. Errores personalizados de la aplicación (400, 401, 403, 404, 409)
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
       error: {
         message: err.message,
         statusCode: err.statusCode,
+        ...(err instanceof BadRequestError && err.fields && { fields: err.fields }),
       },
     });
     return;

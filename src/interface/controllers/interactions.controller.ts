@@ -1,17 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import {
-  CreateInteractionUseCase,
-  GetMyInteractionsUseCase,
-  GetAllInteractionsUseCase,
-} from '../../application/usecases/interactions/interactionUseCases.js';
-import { UnauthorizedError } from '../../domain/entities/errors.js';
+import { InteractionsUseCase } from '../../application/interactions.use-case.js';
+import { UnauthorizedError } from '../../application/errors/unauthorized.error.js';
 
-export class InteractionController {
-  constructor(
-    private readonly createInteractionUseCase: CreateInteractionUseCase,
-    private readonly getMyInteractionsUseCase: GetMyInteractionsUseCase,
-    private readonly getAllInteractionsUseCase: GetAllInteractionsUseCase
-  ) {}
+export class InteractionsController {
+  constructor(private readonly interactionsUseCase: InteractionsUseCase) {}
 
   create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -22,7 +14,7 @@ export class InteractionController {
       const { content, experienceId } = req.body;
 
       // REGLA DE ORO DE LA RÚBRICA: El userId se toma estrictamente del token verificado (req.user.id), NUNCA del body
-      const result = await this.createInteractionUseCase.execute({
+      const result = await this.interactionsUseCase.create({
         content,
         experienceId,
         userId: req.user.id,
@@ -34,13 +26,13 @@ export class InteractionController {
     }
   };
 
-  getMy = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getMine = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       if (!req.user) {
         throw new UnauthorizedError('Debes iniciar sesión para consultar tus recuerdos');
       }
 
-      const result = await this.getMyInteractionsUseCase.execute(req.user.id);
+      const result = await this.interactionsUseCase.getMine(req.user.id);
       res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -49,7 +41,7 @@ export class InteractionController {
 
   getAll = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await this.getAllInteractionsUseCase.execute();
+      const result = await this.interactionsUseCase.getAll();
       res.status(200).json(result);
     } catch (error) {
       next(error);
