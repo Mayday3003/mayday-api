@@ -5,13 +5,18 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "build": "tsc && prisma generate",
+    "build": "prisma generate && tsc",
     "start": "node dist/app.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:reset": "tsx prisma/seed.ts --reset",
+    "render:build": "npm ci && npm run build && prisma migrate deploy && npm run db:seed",
     "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

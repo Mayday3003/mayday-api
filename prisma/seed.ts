@@ -6,6 +6,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Iniciando carga de datos semilla (Seed)...');
 
+  // Por defecto el seed solo carga datos en una base vacía: así puede correr en cada deploy
+  // sin borrar nada. Con --reset limpia todo y vuelve a cargar (solo para desarrollo).
+  const reset = process.argv.includes('--reset');
+  if (!reset && (await prisma.user.count()) > 0) {
+    console.log('ℹ️  La base ya tiene datos: seed omitido (usa --reset para recargar).');
+    return;
+  }
+
   // Limpiar datos existentes en orden de dependencia
   await prisma.memoryRequest.deleteMany();
   await prisma.interaction.deleteMany();
