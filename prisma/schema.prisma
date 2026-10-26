@@ -19,33 +19,42 @@ enum ExperienceType {
   experiencia
 }
 
+enum RequestStatus {
+  pendiente
+  aprobada
+  rechazada
+}
+
 model User {
   id           String         @id @default(uuid())
-  name         String
-  email        String         @unique
+  name         String         @db.VarChar(100)
+  email        String         @unique @db.VarChar(150)
   password     String
   role         Role           @default(user)
   createdAt    DateTime       @default(now()) @map("created_at")
   updatedAt    DateTime       @updatedAt @map("updated_at")
 
-  interactions Interaction[]
+  interactions   Interaction[]
+  memoryRequests MemoryRequest[]
 
   @@map("users")
 }
 
 model Experience {
   id           String         @id @default(uuid())
-  title        String
+  title        String         @db.VarChar(150)
   type         ExperienceType
   description  String
   imageUrl     String?        @map("image_url")
-  date         DateTime?
+  date         DateTime?      @db.Date
   participants String[]       @default([])
   createdAt    DateTime       @default(now()) @map("created_at")
   updatedAt    DateTime       @updatedAt @map("updated_at")
 
-  interactions Interaction[]
+  interactions  Interaction[]
+  memoryRequest MemoryRequest?
 
+  @@index([type])
   @@map("experiences")
 }
 
@@ -60,5 +69,31 @@ model Interaction {
   user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   experience   Experience  @relation(fields: [experienceId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([experienceId])
   @@map("interactions")
+}
+
+// Propuesta de recuerdo (formulario principal del muro en la Entrega 1).
+// El admin la aprueba y se convierte en una experiencia del catálogo.
+model MemoryRequest {
+  id           String         @id @default(uuid())
+  title        String         @db.VarChar(150)
+  type         ExperienceType
+  description  String
+  imageUrl     String?        @map("image_url")
+  date         DateTime?      @db.Date
+  participants String[]       @default([])
+  status       RequestStatus  @default(pendiente)
+  userId       String         @map("user_id")
+  experienceId String?        @unique @map("experience_id")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experience   Experience?    @relation(fields: [experienceId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@map("memory_requests")
 }

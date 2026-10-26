@@ -7,6 +7,7 @@ async function main() {
   console.log('🌱 Iniciando carga de datos semilla (Seed)...');
 
   // Limpiar datos existentes en orden de dependencia
+  await prisma.memoryRequest.deleteMany();
   await prisma.interaction.deleteMany();
   await prisma.experience.deleteMany();
   await prisma.user.deleteMany();
@@ -112,6 +113,20 @@ async function main() {
   });
 
   console.log('💬 Interacciones de prueba creadas con relaciones foráneas.');
+
+  // 4. Propuesta de recuerdo pendiente para que el admin pueda probar la aprobación
+  await prisma.memoryRequest.create({
+    data: {
+      title: 'Atardecer en el Parque Arví',
+      type: 'experiencia',
+      description: 'Caminata por los senderos del Arví y picnic viendo cómo se escondía el sol detrás de las montañas.',
+      date: new Date('2026-09-14'),
+      participants: ['Estudiante Evaluador'],
+      userId: normalUser.id,
+    },
+  });
+
+  console.log('📝 Propuesta de recuerdo pendiente creada.');
   console.log('✅ Seed completado con éxito.');
 }
 
