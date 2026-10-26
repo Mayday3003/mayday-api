@@ -11,7 +11,7 @@ export class RegisterUserDto implements RegisterDto {
   email: string;
 
   @IsString({ message: 'La contraseña es obligatoria' })
-  @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
+  @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
   password: string;
 
   // Solo se copian los campos permitidos: un `role` en el body nunca llega al DTO

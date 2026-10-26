@@ -105,8 +105,8 @@ export class AuthUseCase {
       throw new BadRequestError('Token de restablecimiento no proporcionado');
     }
 
-    if (!newPassword || newPassword.length < 6) {
-      throw new BadRequestError('La nueva contraseña debe tener al menos 6 caracteres');
+    if (!newPassword || newPassword.length < 8) {
+      throw new BadRequestError('La nueva contraseña debe tener al menos 8 caracteres');
     }
 
     let payload;
