@@ -5,7 +5,13 @@ import authRoutes from './interface/routers/auth.router.js';
 import experienceRoutes from './interface/routers/experiences.router.js';
 import interactionRoutes from './interface/routers/interactions.router.js';
 import memoryRequestRoutes from './interface/routers/memory-requests.router.js';
-import { errorHandler } from './interface/middlewares/error.handler.js';
+import { errorHandler, notFoundHandler } from './interface/middlewares/error.handler.js';
+
+// Sin JWT_SECRET la API no debe arrancar: no hay forma segura de firmar tokens
+if (!process.env.JWT_SECRET) {
+  console.error('❌ Falta la variable de entorno JWT_SECRET');
+  process.exit(1);
+}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -37,6 +43,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/experiencias', experienceRoutes);
 app.use('/api/interacciones', interactionRoutes);
 app.use('/api/propuestas', memoryRequestRoutes);
+
+// Rutas inexistentes -> 404
+app.use(notFoundHandler);
 
 // Manejador global de errores (siempre al final de las rutas)
 app.use(errorHandler);
