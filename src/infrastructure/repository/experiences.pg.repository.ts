@@ -1,15 +1,16 @@
 import type { IExperienceRepository } from '../../domain/repository/IExperience.repository.js';
 import type { ExperienceEntity, ExperienceCategory, CreateExperienceDto, UpdateExperienceDto } from '../../domain/models/Experience.js';
 import type { PaginatedResult } from '../../domain/models/Pagination.js';
+import { Prisma } from '@prisma/client';
 import prisma from './client.js';
 
 export class ExperiencePgRepository implements IExperienceRepository {
   async findPaginated(page: number = 1, limit: number = 10, search?: string, type?: string): Promise<PaginatedResult<ExperienceEntity>> {
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.ExperienceWhereInput = {};
     if (type && type !== 'todos') {
-      where.type = type;
+      where.type = type as ExperienceCategory;
     }
     if (search && search.trim() !== '') {
       where.OR = [
