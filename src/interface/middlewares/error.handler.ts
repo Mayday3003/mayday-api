@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
+import multer from 'multer';
 import { AppError } from '../../application/errors/app.error.js';
 import { BadRequestError } from '../../application/errors/bad-request.error.js';
 
@@ -26,6 +27,19 @@ export function errorHandler(
         message: err.message,
         statusCode: err.statusCode,
         ...(err instanceof BadRequestError && err.fields && { fields: err.fields }),
+      },
+    });
+    return;
+  }
+
+  // Archivo demasiado grande u otros errores de multer
+  if (err instanceof multer.MulterError) {
+    const message = err.code === 'LIMIT_FILE_SIZE' ? 'La imagen no puede superar 5 MB' : 'Archivo inválido';
+    res.status(400).json({
+      error: {
+        message,
+        statusCode: 400,
+        fields: { image: message },
       },
     });
     return;

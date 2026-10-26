@@ -4,10 +4,14 @@ import type { PaginatedResult } from '../domain/models/Pagination.js';
 import { CreateExperienceBodyDto, UpdateExperienceBodyDto } from '../infrastructure/dtos/experience.dto.js';
 import { ExperienceQueryDto } from '../infrastructure/dtos/pagination.dto.js';
 import { BadRequestError } from './errors/bad-request.error.js';
+import type { IStorageService, UploadedImage } from '../domain/services/IStorage.service.js';
 import { NotFoundError } from './errors/not-found.error.js';
 
 export class ExperiencesUseCase {
-  constructor(private readonly experienceRepository: IExperienceRepository) {}
+  constructor(
+    private readonly experienceRepository: IExperienceRepository,
+    private readonly storageService: IStorageService
+  ) {}
 
   async getAll(query: Record<string, unknown>): Promise<PaginatedResult<ExperienceEntity>> {
     // page/limit/type inválidos -> 400 (antes ?page=abc terminaba en NaN)
@@ -48,7 +52,29 @@ export class ExperiencesUseCase {
   }
 
   async delete(id: string): Promise<boolean> {
-    await this.getById(id);
-    return this.experienceRepository.delete(id);
+    const experience = await this.getById(id);
+    const deleted = await this.experienceRepository.delete(id);
+    // Al borrar la experiencia también se borra su imagen del storage
+    if (experience.imageUrl) {
+      await this.storageService.removeByUrl(experience.imageUrl);
+    }
+    return deleted;
+  }
+
+  async uploadImage(id: string, file: UploadedImage | undefined): Promise<ExperienceEntity> {
+    if (!file) {
+      throw new BadRequestError('Falta la imagen', { image: 'Adjunta un archivo en el campo "image"' });
+    }
+    const experience = await this.getById(id);
+
+    const extension = file.mimetype.split('/')[1];
+    const imageUrl = await this.storageService.upload(`${id}/${Date.now()}.${extension}`, file);
+    const updated = await this.experienceRepository.update(id, { imageUrl });
+
+    // La imagen anterior ya no se usa
+    if (experience.imageUrl) {
+      await this.storageService.removeByUrl(experience.imageUrl);
+    }
+    return updated;
   }
 }
