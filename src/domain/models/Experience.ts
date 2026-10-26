@@ -24,8 +24,17 @@ export interface CreateExperienceDto {
 export type UpdateExperienceDto = Partial<CreateExperienceDto>;
 
 export interface ExperienceFilterOptions {
-  page?: number;
-  limit?: number;
+  page: number;
+  limit: number;
   search?: string;
   type?: string;
+  participant?: string;
+  from?: string; // AAAA-MM-DD, inclusive
+  to?: string; // AAAA-MM-DD, inclusive
+}
+
+// Valores para llenar los selects de filtros en el frontend
+export interface ExperienceMeta {
+  types: ExperienceCategory[];
+  participants: string[];
 }

@@ -1,5 +1,5 @@
 import type { IExperienceRepository } from '../domain/repository/IExperience.repository.js';
-import type { ExperienceEntity } from '../domain/models/Experience.js';
+import type { ExperienceEntity, ExperienceMeta } from '../domain/models/Experience.js';
 import type { PaginatedResult } from '../domain/models/Pagination.js';
 import { CreateExperienceBodyDto, UpdateExperienceBodyDto } from '../infrastructure/dtos/experience.dto.js';
 import { ExperienceQueryDto } from '../infrastructure/dtos/pagination.dto.js';
@@ -13,7 +13,14 @@ export class ExperiencesUseCase {
     // page/limit/type inválidos -> 400 (antes ?page=abc terminaba en NaN)
     const dto = new ExperienceQueryDto(query);
     await dto.validateDto();
-    return this.experienceRepository.findPaginated(dto.page, dto.limit, dto.search, dto.type);
+    if (dto.from && dto.to && dto.from > dto.to) {
+      throw new BadRequestError('Rango de fechas inválido', { from: 'from no puede ser posterior a to' });
+    }
+    return this.experienceRepository.findPaginated(dto);
+  }
+
+  async getMeta(): Promise<ExperienceMeta> {
+    return this.experienceRepository.getMeta();
   }
 
   async getById(id: string): Promise<ExperienceEntity> {

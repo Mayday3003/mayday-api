@@ -13,6 +13,15 @@ export class ExperiencesController {
     }
   };
 
+  getMeta = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const result = await this.experiencesUseCase.getMeta();
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;

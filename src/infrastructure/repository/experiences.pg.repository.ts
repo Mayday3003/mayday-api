@@ -1,11 +1,19 @@
 import type { IExperienceRepository } from '../../domain/repository/IExperience.repository.js';
-import type { ExperienceEntity, ExperienceCategory, CreateExperienceDto, UpdateExperienceDto } from '../../domain/models/Experience.js';
+import type {
+  ExperienceEntity,
+  ExperienceCategory,
+  ExperienceFilterOptions,
+  ExperienceMeta,
+  CreateExperienceDto,
+  UpdateExperienceDto,
+} from '../../domain/models/Experience.js';
 import type { PaginatedResult } from '../../domain/models/Pagination.js';
 import { Prisma } from '@prisma/client';
 import prisma from './client.js';
 
 export class ExperiencePgRepository implements IExperienceRepository {
-  async findPaginated(page: number = 1, limit: number = 10, search?: string, type?: string): Promise<PaginatedResult<ExperienceEntity>> {
+  async findPaginated(filters: ExperienceFilterOptions): Promise<PaginatedResult<ExperienceEntity>> {
+    const { page, limit, search, type, participant, from, to } = filters;
     const skip = (page - 1) * limit;
 
     const where: Prisma.ExperienceWhereInput = {};
@@ -17,6 +25,16 @@ export class ExperiencePgRepository implements IExperienceRepository {
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
       ];
+    }
+    // Todos los filtros se combinan (AND) en el mismo where
+    if (participant) {
+      where.participants = { has: participant };
+    }
+    if (from || to) {
+      where.date = {
+        ...(from && { gte: new Date(from) }),
+        ...(to && { lte: new Date(to) }),
+      };
     }
 
     const [total, items] = await Promise.all([
@@ -43,6 +61,12 @@ export class ExperiencePgRepository implements IExperienceRepository {
         type: item.type as ExperienceCategory,
       })),
     };
+  }
+
+  async getMeta(): Promise<ExperienceMeta> {
+    const rows = await prisma.experience.findMany({ select: { participants: true } });
+    const participants = [...new Set(rows.flatMap((row) => row.participants))].sort((a, b) => a.localeCompare(b, 'es'));
+    return { types: ['viaje', 'situacion', 'experiencia'], participants };
   }
 
   async findById(id: string): Promise<ExperienceEntity | null> {

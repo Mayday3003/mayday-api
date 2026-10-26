@@ -1,4 +1,4 @@
-import { IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsDateString, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 import type { ExperienceFilterOptions } from '../../domain/models/Experience.js';
 import { validateOrThrow } from './validate.js';
 
@@ -28,11 +28,27 @@ export class ExperienceQueryDto implements ExperienceFilterOptions {
   @IsIn(['viaje', 'situacion', 'experiencia', 'todos'], { message: 'type debe ser: viaje, situacion, experiencia o todos' })
   type?: string;
 
+  @IsOptional()
+  @IsString({ message: 'participant debe ser texto' })
+  @MaxLength(100, { message: 'participant no puede superar 100 caracteres' })
+  participant?: string;
+
+  @IsOptional()
+  @IsDateString({}, { message: 'from debe tener formato AAAA-MM-DD' })
+  from?: string;
+
+  @IsOptional()
+  @IsDateString({}, { message: 'to debe tener formato AAAA-MM-DD' })
+  to?: string;
+
   constructor(query: Record<string, unknown>) {
     this.page = toInt(query['page']) ?? 1;
     this.limit = toInt(query['limit']) ?? 10;
     this.search = typeof query['search'] === 'string' && query['search'].trim() !== '' ? query['search'].trim() : (query['search'] as string | undefined);
     this.type = query['type'] as string | undefined;
+    this.participant = typeof query['participant'] === 'string' ? query['participant'].trim() || undefined : (query['participant'] as string | undefined);
+    this.from = query['from'] as string | undefined;
+    this.to = query['to'] as string | undefined;
   }
 
   validateDto(): Promise<void> {

@@ -15,6 +15,8 @@ const controller = new ExperiencesController(useCase);
 // GET /api/experiencias -> { pagination, data }
 router.get('/', controller.getAll);
 // GET /api/experiencias/:id -> detalle con interacciones
+// GET /api/experiencias/meta -> tipos y participantes para los filtros (antes de /:id)
+router.get('/meta', controller.getMeta);
 router.get('/:id', validateIdParam, controller.getById);
 
 // Rutas protegidas solo para rol 'admin' (Criterio 4 de la rúbrica)
