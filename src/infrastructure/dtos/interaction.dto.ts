@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsString, IsUUID, MinLength } from 'class-validator';
 import { validateOrThrow } from './validate.js';
 
 // Body de POST /api/interacciones. El userId NO es parte del DTO: sale del token
@@ -7,8 +7,7 @@ export class CreateInteractionBodyDto {
   @MinLength(3, { message: 'El recuerdo o comentario debe tener al menos 3 caracteres' })
   content: string;
 
-  @IsString({ message: 'La experiencia es obligatoria' })
-  @IsNotEmpty({ message: 'La experiencia es obligatoria' })
+  @IsUUID('all', { message: 'experienceId debe ser un UUID válido' })
   experienceId: string;
 
   constructor(payload: Record<string, unknown>) {

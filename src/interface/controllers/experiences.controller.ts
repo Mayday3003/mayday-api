@@ -6,12 +6,7 @@ export class ExperiencesController {
 
   getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
-      const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
-      const search = req.query.search as string | undefined;
-      const type = req.query.type as string | undefined;
-
-      const result = await this.experiencesUseCase.getAll(page, limit, search, type);
+      const result = await this.experiencesUseCase.getAll(req.query);
       res.status(200).json(result);
     } catch (error) {
       next(error);
