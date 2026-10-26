@@ -3,12 +3,13 @@ import { InteractionsController } from '../controllers/interactions.controller.j
 import { InteractionsUseCase } from '../../application/interactions.use-case.js';
 import { InteractionPgRepository } from '../../infrastructure/repository/interactions.pg.repository.js';
 import { ExperiencePgRepository } from '../../infrastructure/repository/experiences.pg.repository.js';
+import { UserPgRepository } from '../../infrastructure/repository/users.pg.repository.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
 import { soloAdmin } from '../middlewares/role.middleware.js';
 
 const router: Router = Router();
 
-const useCase = new InteractionsUseCase(new InteractionPgRepository(), new ExperiencePgRepository());
+const useCase = new InteractionsUseCase(new InteractionPgRepository(), new ExperiencePgRepository(), new UserPgRepository());
 const controller = new InteractionsController(useCase);
 
 // 1. POST /api/interacciones -> Usuario autenticado (crea a su nombre usando el token)
