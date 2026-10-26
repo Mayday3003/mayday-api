@@ -1,0 +1,12 @@
+name: produccion
+variables:
+  - name: baseUrl
+    value: https://mayday-api-v9ls.onrender.com
+  - name: adminToken
+    value: ""
+  - name: userToken
+    value: ""
+  - name: experienceId
+    value: ""
+  - name: propuestaId
+    value: ""

@@ -1,0 +1,17 @@
+info:
+  name: listar con filtros
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/experiencias?type=viaje&participant=Mariana&from=2025-01-01&to=2026-12-31&search=mar"
+  auth: inherit
+
+docs: "Esperado: 200 filtros combinados"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,17 @@
+info:
+  name: listar paginado
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/experiencias?page=1&limit=6"
+  auth: inherit
+
+docs: "Esperado: 200 { pagination, data }"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

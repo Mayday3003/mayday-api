@@ -1,0 +1,17 @@
+info:
+  name: meta
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/experiencias/meta"
+  auth: inherit
+
+docs: "Esperado: 200 { types, participants }"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

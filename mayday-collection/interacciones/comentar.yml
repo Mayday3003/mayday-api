@@ -1,0 +1,28 @@
+info:
+  name: comentar
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/interacciones"
+  headers:
+    - name: Authorization
+      value: Bearer {{userToken}}
+  body:
+    type: json
+    data: |-
+      {
+        "content": "Qué recuerdo tan bonito",
+        "experienceId": "{{experienceId}}",
+        "userId": "intento-de-suplantar"
+      }
+  auth: inherit
+
+docs: "Esperado: 201 a nombre del dueño del token"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

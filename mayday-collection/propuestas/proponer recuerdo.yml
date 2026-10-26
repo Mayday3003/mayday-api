@@ -1,0 +1,32 @@
+info:
+  name: proponer recuerdo
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/propuestas"
+  headers:
+    - name: Authorization
+      value: Bearer {{userToken}}
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Picnic en el Arví",
+        "type": "experiencia",
+        "description": "Caminata por los senderos y picnic al atardecer.",
+        "date": "2026-09-14",
+        "participants": [
+          "Evaluador"
+        ]
+      }
+  auth: inherit
+
+docs: "Esperado: 201 estado pendiente"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

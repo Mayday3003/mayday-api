@@ -1,0 +1,24 @@
+info:
+  name: login user
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "evaluador@mayday3003.world",
+        "password": "UserMayday2026*"
+      }
+  auth: inherit
+
+docs: "Esperado: 200. Copiar token a userToken"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,17 @@
+info:
+  name: eliminar sin token
+  type: http
+  seq: 8
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/experiencias/{{experienceId}}"
+  auth: inherit
+
+docs: "Esperado: 401"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

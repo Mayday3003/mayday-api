@@ -1,0 +1,26 @@
+info:
+  name: editar (admin)
+  type: http
+  seq: 7
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/experiencias/{{experienceId}}"
+  headers:
+    - name: Authorization
+      value: Bearer {{adminToken}}
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Atardecer en Guatapé (editado)"
+      }
+  auth: inherit
+
+docs: "Esperado: 200"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

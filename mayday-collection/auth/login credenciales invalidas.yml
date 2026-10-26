@@ -1,0 +1,24 @@
+info:
+  name: login credenciales invalidas
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "admin@mayday3003.world",
+        "password": "incorrecta123"
+      }
+  auth: inherit
+
+docs: "Esperado: 401 Credenciales inválidas"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

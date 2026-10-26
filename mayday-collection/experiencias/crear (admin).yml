@@ -1,0 +1,32 @@
+info:
+  name: crear (admin)
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/experiencias"
+  headers:
+    - name: Authorization
+      value: Bearer {{adminToken}}
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Atardecer en Guatapé",
+        "type": "viaje",
+        "description": "Subida a la piedra del Peñol y paseo en lancha por el embalse.",
+        "date": "2026-07-12",
+        "participants": [
+          "Mariana"
+        ]
+      }
+  auth: inherit
+
+docs: "Esperado: 201"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
