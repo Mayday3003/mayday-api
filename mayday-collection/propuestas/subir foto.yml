@@ -1,0 +1,27 @@
+info:
+  name: subir foto
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/propuestas/{{propuestaId}}/imagen"
+  headers:
+    - name: Authorization
+      value: Bearer {{userToken}}
+  body:
+    type: multipart-form
+    data:
+      - name: image
+        type: file
+        value:
+          - assets/foto-prueba.jpg
+  auth: inherit
+
+docs: "Esperado: 200 con imageUrl del bucket. Con adminToken (no es el autor) -> 403; sin token -> 401; propuesta ya revisada -> 409. Antes: copiar el id de 'proponer recuerdo' en propuestaId"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

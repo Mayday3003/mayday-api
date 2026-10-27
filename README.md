@@ -5,8 +5,8 @@ API REST de **Mayday · Bitácora y muro de recuerdos** ([mayday3003.world](http
 | | |
 |---|---|
 | API en producción | https://mayday-api-v9ls.onrender.com ([`/health`](https://mayday-api-v9ls.onrender.com/health)) |
-| Frontend | _pendiente (Vercel)_ |
-| Repo del frontend | _pendiente_ |
+| Frontend | https://www.mayday3003.world (Vercel) |
+| Repo del frontend | https://github.com/Mayday3003/mayday-web |
 
 > La API está en el plan gratuito de Render: después de 15 minutos sin uso se duerme y la primera petición tarda unos 50 segundos.
 
@@ -66,7 +66,7 @@ Todas las rutas empiezan por `/api`. Los errores responden `{ error: { message, 
 | GET | `/experiencias/:id` | público | 200 (con comentarios) · 400 · 404 |
 | POST | `/experiencias` | admin | 201 · 400 · 401 · 403 |
 | PUT | `/experiencias/:id` | admin | 200 · 400 · 401 · 403 · 404 |
-| DELETE | `/experiencias/:id` | admin | 204 · 401 · 403 · 404 |
+| DELETE | `/experiencias/:id` | admin o quien propuso el recuerdo | 204 (borra también su propuesta, foto y comentarios) · 401 · 403 · 404 |
 | POST | `/experiencias/:id/imagen` | admin | 200 · 400 · 401 · 403 · 404 |
 
 Query de `GET /experiencias`, combinables: `page` (≥ 1), `limit` (1–50), `search` (título o descripción), `type` (`viaje`, `situacion`, `experiencia`), `participant`, `from` y `to` (`AAAA-MM-DD`).
@@ -85,9 +85,13 @@ La imagen se envía como `multipart/form-data` en el campo `image` (JPG, PNG, WE
 |---|---|---|---|
 | POST | `/propuestas` | usuario autenticado | 201 · 400 · 401 |
 | GET | `/propuestas/mias` | usuario autenticado | 200 |
+| DELETE | `/propuestas/:id` | autor o admin | 204 · 401 · 403 · 404 · 409 ya aprobada (se borra desde el recuerdo) |
+| POST | `/propuestas/:id/imagen` | autor de la propuesta | 200 · 400 · 401 · 403 no es el autor · 404 · 409 ya revisada |
 | GET | `/propuestas?status=` | admin | 200 · 400 · 403 |
 | PATCH | `/propuestas/:id/aprobar` | admin | 200 (crea la experiencia) · 403 · 404 · 409 ya revisada |
 | PATCH | `/propuestas/:id/rechazar` | admin | 200 · 403 · 404 · 409 ya revisada |
+
+La foto de una propuesta se sube desde el dispositivo igual que la de una experiencia (`multipart/form-data`, campo `image`) y queda en el bucket bajo `propuestas/<id>/`. Si se aprueba, la experiencia usa esa misma foto; si se rechaza, se borra del bucket.
 
 La colección de Bruno con todas estas peticiones está en [`mayday-collection/`](mayday-collection), con entornos `produccion` y `local`.
 
