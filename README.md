@@ -118,7 +118,8 @@ npm test                      # pruebas de los middlewares de auth y rol
 | `DIRECT_URL` | Conexión directa, la usa Prisma para las migraciones (puerto 5432) |
 | `JWT_SECRET` | Secreto para firmar los tokens; la API no arranca sin él |
 | `JWT_EXPIRES_IN` | Duración del token (`1d` en producción) |
-| `FRONTEND_URL` | Origen permitido por CORS |
+| `FRONTEND_URL` | URL del frontend: enlace de restablecer contraseña y origen permitido por CORS |
+| `CORS_ORIGINS` | Orígenes extra para CORS, separados por coma (`mayday3003.world` y `www.mayday3003.world` ya están fijos) |
 | `RESEND_API_KEY` | Correos de bienvenida y de recuperación de contraseña |
 | `SUPABASE_URL` · `SUPABASE_SERVICE_ROLE_KEY` · `SUPABASE_BUCKET` | Subida de imágenes a Supabase Storage |
 

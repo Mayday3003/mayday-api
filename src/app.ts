@@ -17,10 +17,28 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
-// Configuración de CORS estricta (no wildcard '*') según exigencia de la rúbrica
+// Sin '/' final: el navegador manda el Origin sin él y la comparación es exacta
+const normalize = (url: string) => url.trim().replace(/\/+$/, '');
+
+// CORS estricto (no wildcard '*') según exigencia de la rúbrica.
+// Los dominios de producción van fijos; CORS_ORIGINS agrega otros separados por coma (p. ej. el *.vercel.app)
+const ALLOWED_ORIGINS = [
+  ...new Set(
+    [
+      FRONTEND_URL,
+      'http://localhost:3000',
+      'https://mayday3003.world',
+      'https://www.mayday3003.world',
+      ...(process.env.CORS_ORIGINS ?? '').split(','),
+    ]
+      .map(normalize)
+      .filter(Boolean)
+  ),
+];
+
 app.use(
   cors({
-    origin: [FRONTEND_URL, 'http://localhost:3000', 'https://mayday3003.world'],
+    origin: ALLOWED_ORIGINS,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -52,7 +70,7 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`🌌 Servidor Mayday API corriendo en http://localhost:${PORT}`);
-  console.log(`🛡️  CORS configurado para: ${FRONTEND_URL}`);
+  console.log(`🛡️  CORS configurado para: ${ALLOWED_ORIGINS.join(', ')}`);
 });
 
 export default app;
