@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { Prisma } from '@prisma/client';
 import multer from 'multer';
 import { AppError } from '../../application/errors/app.error.js';
 import { BadRequestError } from '../../application/errors/bad-request.error.js';
+import { translatePrismaError } from '../../infrastructure/repository/prisma-errors.js';
 
 // 404 para cualquier ruta que no exista
 export function notFoundHandler(_req: Request, res: Response): void {
@@ -20,6 +20,10 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
+  // Los errores conocidos de Prisma llegan ya traducidos a errores de la aplicación
+  const prismaError = translatePrismaError(err);
+  if (prismaError) err = prismaError;
+
   // 1. Errores personalizados de la aplicación (400, 401, 403, 404, 409)
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
@@ -56,43 +60,7 @@ export function errorHandler(
     return;
   }
 
-  // 3. Errores conocidos de Prisma (evitar fugas de stack trace o nombres internos de base de datos)
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    // P2002: Unique constraint failed
-    if (err.code === 'P2002') {
-      res.status(409).json({
-        error: {
-          message: 'Conflicto: Ya existe un registro con esos datos únicos',
-          statusCode: 409,
-        },
-      });
-      return;
-    }
-
-    // P2003: Foreign key constraint failed (la referencia no existe)
-    if (err.code === 'P2003') {
-      res.status(400).json({
-        error: {
-          message: 'La referencia enviada no existe',
-          statusCode: 400,
-        },
-      });
-      return;
-    }
-
-    // P2025: Record not found
-    if (err.code === 'P2025') {
-      res.status(404).json({
-        error: {
-          message: 'El registro solicitado no fue encontrado en la base de datos',
-          statusCode: 404,
-        },
-      });
-      return;
-    }
-  }
-
-  // 4. Error interno del servidor (500) sin stack trace expuesto
+  // 3. Error interno del servidor (500) sin stack trace expuesto
   console.error('💥 Error no controlado:', err);
 
   res.status(500).json({
