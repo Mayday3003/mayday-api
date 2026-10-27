@@ -6,6 +6,8 @@ import { ExperienceQueryDto } from '../infrastructure/dtos/pagination.dto.js';
 import { BadRequestError } from './errors/bad-request.error.js';
 import type { IStorageService, UploadedImage } from '../domain/services/IStorage.service.js';
 import { NotFoundError } from './errors/not-found.error.js';
+import { ForbiddenError } from './errors/forbidden.error.js';
+import type { UserRole } from '../domain/models/User.js';
 
 export class ExperiencesUseCase {
   constructor(
@@ -51,8 +53,12 @@ export class ExperiencesUseCase {
     return this.experienceRepository.update(id, dto);
   }
 
-  async delete(id: string): Promise<boolean> {
+  // Borra el admin o quien propuso el recuerdo; cualquier otro usuario recibe 403
+  async delete(id: string, requester: { id: string; role: UserRole }): Promise<boolean> {
     const experience = await this.getById(id);
+    if (requester.role !== 'admin' && experience.authorId !== requester.id) {
+      throw new ForbiddenError('Solo quien subió el recuerdo o el admin pueden borrarlo');
+    }
     const deleted = await this.experienceRepository.delete(id);
     // Al borrar la experiencia también se borra su imagen del storage
     if (experience.imageUrl) {

@@ -94,4 +94,8 @@ export class MemoryRequestPgRepository implements IMemoryRequestRepository {
     });
     return toEntity(updated);
   }
+
+  async delete(id: string): Promise<void> {
+    await prisma.memoryRequest.delete({ where: { id } });
+  }
 }

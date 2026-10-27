@@ -18,6 +18,8 @@ const controller = new MemoryRequestsController(useCase);
 router.post('/', authenticate, controller.create);
 router.get('/mias', authenticate, controller.getMine);
 // El autor sube la foto desde su dispositivo (multipart, campo "image") mientras está pendiente
+// El autor o el admin (el permiso se revisa en el caso de uso)
+router.delete('/:id', authenticate, validateIdParam, controller.delete);
 router.post('/:id/imagen', authenticate, validateIdParam, uploadImage, controller.uploadImage);
 
 // Solo admin: revisar, aprobar (se vuelve experiencia del catálogo) o rechazar

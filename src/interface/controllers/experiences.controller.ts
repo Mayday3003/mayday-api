@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { UnauthorizedError } from '../../application/errors/unauthorized.error.js';
 import { ExperiencesUseCase } from '../../application/experiences.use-case.js';
 
 export class ExperiencesController {
@@ -64,7 +65,10 @@ export class ExperiencesController {
   delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      await this.experiencesUseCase.delete(id);
+      if (!req.user) {
+        throw new UnauthorizedError('Debes iniciar sesión para borrar un recuerdo');
+      }
+      await this.experiencesUseCase.delete(id, req.user);
       res.status(204).send();
     } catch (error) {
       next(error);

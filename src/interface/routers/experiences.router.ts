@@ -27,6 +27,7 @@ router.post('/', authenticate, soloAdmin, controller.create);
 router.put('/:id', authenticate, soloAdmin, validateIdParam, controller.update);
 // POST /api/experiencias/:id/imagen -> multipart/form-data con el campo "image" (máx. 5 MB)
 router.post('/:id/imagen', authenticate, soloAdmin, validateIdParam, uploadImage, controller.uploadImage);
-router.delete('/:id', authenticate, soloAdmin, validateIdParam, controller.delete);
+// Admin o quien propuso el recuerdo: el permiso se revisa en el caso de uso (403 si no es ninguno)
+router.delete('/:id', authenticate, validateIdParam, controller.delete);
 
 export default router;

@@ -10,6 +10,8 @@ export interface ExperienceEntity {
   participants: string[];
   createdAt: Date;
   updatedAt: Date;
+  // Quien propuso el recuerdo (null si lo creó el admin directamente). Solo viene en el detalle.
+  authorId?: string | null;
 }
 
 export interface CreateExperienceDto {

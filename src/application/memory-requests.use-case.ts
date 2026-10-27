@@ -5,6 +5,7 @@ import { BadRequestError } from './errors/bad-request.error.js';
 import { ConflictError } from './errors/conflict.error.js';
 import { ForbiddenError } from './errors/forbidden.error.js';
 import type { IStorageService, UploadedImage } from '../domain/services/IStorage.service.js';
+import type { UserRole } from '../domain/models/User.js';
 import type { IUserRepository } from '../domain/repository/IUser.repository.js';
 import { NotFoundError } from './errors/not-found.error.js';
 import { UnauthorizedError } from './errors/unauthorized.error.js';
@@ -54,6 +55,24 @@ export class MemoryRequestsUseCase {
       return this.memoryRequestRepository.updateImage(id, null);
     }
     return rejected;
+  }
+
+  // El autor o el admin. Una propuesta aprobada ya es un recuerdo del muro: se borra desde ahí
+  async delete(id: string, requester: { id: string; role: UserRole }): Promise<void> {
+    const request = await this.memoryRequestRepository.findById(id);
+    if (!request) {
+      throw new NotFoundError(`No se encontró la propuesta con id: ${id}`);
+    }
+    if (requester.role !== 'admin' && request.userId !== requester.id) {
+      throw new ForbiddenError('Solo quien propuso el recuerdo o el admin pueden borrarlo');
+    }
+    if (request.status === 'aprobada') {
+      throw new ConflictError('La propuesta ya está en el muro: borra el recuerdo desde allí');
+    }
+    await this.memoryRequestRepository.delete(id);
+    if (request.imageUrl) {
+      await this.storageService.removeByUrl(request.imageUrl);
+    }
   }
 
   // Solo el autor sube la foto, y solo mientras la propuesta está pendiente

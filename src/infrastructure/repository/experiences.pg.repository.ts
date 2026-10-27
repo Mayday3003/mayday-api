@@ -81,14 +81,17 @@ export class ExperiencePgRepository implements IExperienceRepository {
           },
           orderBy: { createdAt: 'desc' },
         },
+        memoryRequest: { select: { userId: true } },
       },
     });
 
     if (!item) return null;
 
+    const { memoryRequest, ...experience } = item;
     return {
-      ...item,
+      ...experience,
       type: item.type as ExperienceCategory,
+      authorId: memoryRequest?.userId ?? null,
     };
   }
 
@@ -130,7 +133,11 @@ export class ExperiencePgRepository implements IExperienceRepository {
   }
 
   async delete(id: string): Promise<boolean> {
-    await prisma.experience.delete({ where: { id } });
+    // La propuesta que la originó también se borra: si no, quedaría "aprobada" apuntando a nada
+    await prisma.$transaction([
+      prisma.memoryRequest.deleteMany({ where: { experienceId: id } }),
+      prisma.experience.delete({ where: { id } }),
+    ]);
     return true;
   }
 }

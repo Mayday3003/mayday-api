@@ -72,4 +72,17 @@ export class MemoryRequestsController {
       next(error);
     }
   };
+
+  delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedError('Debes iniciar sesión para borrar una propuesta');
+      }
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      await this.memoryRequestsUseCase.delete(id, req.user);
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  };
 }
