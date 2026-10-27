@@ -3,6 +3,8 @@ import type { MemoryRequestEntity, RequestStatus } from '../domain/models/Memory
 import { CreateMemoryRequestBodyDto } from '../infrastructure/dtos/memory-request.dto.js';
 import { BadRequestError } from './errors/bad-request.error.js';
 import { ConflictError } from './errors/conflict.error.js';
+import { ForbiddenError } from './errors/forbidden.error.js';
+import type { IStorageService, UploadedImage } from '../domain/services/IStorage.service.js';
 import type { IUserRepository } from '../domain/repository/IUser.repository.js';
 import { NotFoundError } from './errors/not-found.error.js';
 import { UnauthorizedError } from './errors/unauthorized.error.js';
@@ -12,7 +14,8 @@ const STATUSES: RequestStatus[] = ['pendiente', 'aprobada', 'rechazada'];
 export class MemoryRequestsUseCase {
   constructor(
     private readonly memoryRequestRepository: IMemoryRequestRepository,
-    private readonly userRepository: IUserRepository
+    private readonly userRepository: IUserRepository,
+    private readonly storageService: IStorageService
   ) {}
 
   async create(payload: Record<string, unknown>, userId: string): Promise<MemoryRequestEntity> {
@@ -43,8 +46,35 @@ export class MemoryRequestsUseCase {
   }
 
   async reject(id: string): Promise<MemoryRequestEntity> {
-    await this.getPending(id);
-    return this.memoryRequestRepository.reject(id);
+    const request = await this.getPending(id);
+    const rejected = await this.memoryRequestRepository.reject(id);
+    // Una propuesta rechazada nunca llega al muro: su foto subida ya no sirve
+    if (request.imageUrl) {
+      await this.storageService.removeByUrl(request.imageUrl);
+      return this.memoryRequestRepository.updateImage(id, null);
+    }
+    return rejected;
+  }
+
+  // Solo el autor sube la foto, y solo mientras la propuesta está pendiente
+  async uploadImage(id: string, userId: string, file: UploadedImage | undefined): Promise<MemoryRequestEntity> {
+    if (!file) {
+      throw new BadRequestError('Falta la imagen', { image: 'Adjunta un archivo en el campo "image"' });
+    }
+    const request = await this.getPending(id);
+    if (request.userId !== userId) {
+      throw new ForbiddenError('Solo quien propuso el recuerdo puede subir su foto');
+    }
+
+    const extension = file.mimetype.split('/')[1];
+    const imageUrl = await this.storageService.upload(`propuestas/${id}/${Date.now()}.${extension}`, file);
+    const updated = await this.memoryRequestRepository.updateImage(id, imageUrl);
+
+    // La imagen anterior ya no se usa (si era un link externo, removeByUrl la ignora)
+    if (request.imageUrl) {
+      await this.storageService.removeByUrl(request.imageUrl);
+    }
+    return updated;
   }
 
   // Solo una propuesta pendiente se puede aprobar o rechazar

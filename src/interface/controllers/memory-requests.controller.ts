@@ -59,4 +59,17 @@ export class MemoryRequestsController {
       next(error);
     }
   };
+
+  uploadImage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedError('Debes iniciar sesión para subir una foto');
+      }
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const result = await this.memoryRequestsUseCase.uploadImage(id, req.user.id, req.file);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

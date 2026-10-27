@@ -85,4 +85,13 @@ export class MemoryRequestPgRepository implements IMemoryRequestRepository {
     });
     return toEntity(updated);
   }
+
+  async updateImage(id: string, imageUrl: string | null): Promise<MemoryRequestEntity> {
+    const updated = await prisma.memoryRequest.update({
+      where: { id },
+      data: { imageUrl },
+      include: includeUser,
+    });
+    return toEntity(updated);
+  }
 }

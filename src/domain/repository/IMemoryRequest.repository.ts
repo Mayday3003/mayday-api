@@ -8,4 +8,5 @@ export interface IMemoryRequestRepository {
   // Crea la experiencia del catálogo y marca la propuesta como aprobada en una sola transacción
   approve(id: string): Promise<MemoryRequestEntity>;
   reject(id: string): Promise<MemoryRequestEntity>;
+  updateImage(id: string, imageUrl: string | null): Promise<MemoryRequestEntity>;
 }
