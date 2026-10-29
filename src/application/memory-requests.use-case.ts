@@ -30,6 +30,22 @@ export class MemoryRequestsUseCase {
     return this.memoryRequestRepository.create(dto, userId);
   }
 
+  // Solo el autor, y solo mientras está pendiente: una aprobada ya es recuerdo del muro y se edita allí
+  async update(id: string, payload: Record<string, unknown>, userId: string): Promise<MemoryRequestEntity> {
+    const dto = new CreateMemoryRequestBodyDto(payload);
+    await dto.validateDto();
+    const request = await this.getPending(id);
+    if (request.userId !== userId) {
+      throw new ForbiddenError('Solo quien propuso el recuerdo puede editarlo');
+    }
+    const updated = await this.memoryRequestRepository.update(id, dto);
+    // Si cambió la foto, la anterior ya no se usa (si era un link externo, removeByUrl la ignora)
+    if (request.imageUrl && updated.imageUrl !== request.imageUrl) {
+      await this.storageService.removeByUrl(request.imageUrl);
+    }
+    return updated;
+  }
+
   async getMine(userId: string): Promise<MemoryRequestEntity[]> {
     return this.memoryRequestRepository.findByUserId(userId);
   }

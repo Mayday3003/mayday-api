@@ -32,6 +32,23 @@ export class MemoryRequestPgRepository implements IMemoryRequestRepository {
     return toEntity(created);
   }
 
+  // Reemplaza los campos de la propuesta; sin imageUrl en el body se deja la foto que ya tenía
+  async update(id: string, data: CreateMemoryRequestDto): Promise<MemoryRequestEntity> {
+    const updated = await prisma.memoryRequest.update({
+      where: { id },
+      data: {
+        title: data.title,
+        type: data.type,
+        description: data.description,
+        ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl || null }),
+        date: data.date ? new Date(data.date) : null,
+        participants: data.participants || [],
+      },
+      include: includeUser,
+    });
+    return toEntity(updated);
+  }
+
   async findById(id: string): Promise<MemoryRequestEntity | null> {
     const item = await prisma.memoryRequest.findUnique({ where: { id }, include: includeUser });
     return item ? toEntity(item) : null;

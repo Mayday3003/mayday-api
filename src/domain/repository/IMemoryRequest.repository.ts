@@ -2,6 +2,7 @@ import type { CreateMemoryRequestDto, MemoryRequestEntity, RequestStatus } from 
 
 export interface IMemoryRequestRepository {
   create(data: CreateMemoryRequestDto, userId: string): Promise<MemoryRequestEntity>;
+  update(id: string, data: CreateMemoryRequestDto): Promise<MemoryRequestEntity>;
   findById(id: string): Promise<MemoryRequestEntity | null>;
   findByUserId(userId: string): Promise<MemoryRequestEntity[]>;
   findAll(status?: RequestStatus): Promise<MemoryRequestEntity[]>;

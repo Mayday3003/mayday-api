@@ -17,6 +17,8 @@ const controller = new MemoryRequestsController(useCase);
 // Usuario autenticado: propone un recuerdo a su nombre y consulta los suyos
 router.post('/', authenticate, controller.create);
 router.get('/mias', authenticate, controller.getMine);
+// El autor edita su propuesta mientras está pendiente
+router.put('/:id', authenticate, validateIdParam, controller.update);
 // El autor sube la foto desde su dispositivo (multipart, campo "image") mientras está pendiente
 // El autor o el admin (el permiso se revisa en el caso de uso)
 router.delete('/:id', authenticate, validateIdParam, controller.delete);

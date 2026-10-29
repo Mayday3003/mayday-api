@@ -18,6 +18,19 @@ export class MemoryRequestsController {
     }
   };
 
+  update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedError('Debes iniciar sesión para editar una propuesta');
+      }
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const result = await this.memoryRequestsUseCase.update(id, req.body ?? {}, req.user.id);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getMine = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       if (!req.user) {
