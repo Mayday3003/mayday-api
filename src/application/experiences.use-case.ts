@@ -9,6 +9,8 @@ import { NotFoundError } from './errors/not-found.error.js';
 import { ForbiddenError } from './errors/forbidden.error.js';
 import type { UserRole } from '../domain/models/User.js';
 
+type Requester = { id: string; role: UserRole };
+
 export class ExperiencesUseCase {
   constructor(
     private readonly experienceRepository: IExperienceRepository,
@@ -43,22 +45,27 @@ export class ExperiencesUseCase {
     return this.experienceRepository.create(dto);
   }
 
-  async update(id: string, payload: Record<string, unknown>): Promise<ExperienceEntity> {
+  // Editan el admin o quien propuso el recuerdo; cualquier otro usuario recibe 403
+  private async getEditable(id: string, requester: Requester, action: string): Promise<ExperienceEntity> {
+    const experience = await this.getById(id);
+    if (requester.role !== 'admin' && experience.authorId !== requester.id) {
+      throw new ForbiddenError(`Solo quien subió el recuerdo o el admin pueden ${action}lo`);
+    }
+    return experience;
+  }
+
+  async update(id: string, payload: Record<string, unknown>, requester: Requester): Promise<ExperienceEntity> {
     const dto = new UpdateExperienceBodyDto(payload);
     await dto.validateDto();
     if (Object.values(dto).every((value) => value === undefined)) {
       throw new BadRequestError('Envía al menos un campo para actualizar');
     }
-    await this.getById(id);
+    await this.getEditable(id, requester, 'editar');
     return this.experienceRepository.update(id, dto);
   }
 
-  // Borra el admin o quien propuso el recuerdo; cualquier otro usuario recibe 403
-  async delete(id: string, requester: { id: string; role: UserRole }): Promise<boolean> {
-    const experience = await this.getById(id);
-    if (requester.role !== 'admin' && experience.authorId !== requester.id) {
-      throw new ForbiddenError('Solo quien subió el recuerdo o el admin pueden borrarlo');
-    }
+  async delete(id: string, requester: Requester): Promise<boolean> {
+    const experience = await this.getEditable(id, requester, 'borrar');
     const deleted = await this.experienceRepository.delete(id);
     // Al borrar la experiencia también se borra su imagen del storage
     if (experience.imageUrl) {
@@ -67,11 +74,11 @@ export class ExperiencesUseCase {
     return deleted;
   }
 
-  async uploadImage(id: string, file: UploadedImage | undefined): Promise<ExperienceEntity> {
+  async uploadImage(id: string, file: UploadedImage | undefined, requester: Requester): Promise<ExperienceEntity> {
     if (!file) {
       throw new BadRequestError('Falta la imagen', { image: 'Adjunta un archivo en el campo "image"' });
     }
-    const experience = await this.getById(id);
+    const experience = await this.getEditable(id, requester, 'editar');
 
     const extension = file.mimetype.split('/')[1];
     const imageUrl = await this.storageService.upload(`${id}/${Date.now()}.${extension}`, file);

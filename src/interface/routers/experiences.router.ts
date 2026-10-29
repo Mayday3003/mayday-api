@@ -24,10 +24,10 @@ router.get('/:id', validateIdParam, controller.getById);
 // Rutas protegidas solo para rol 'admin' (Criterio 4 de la rúbrica)
 // Sin token -> 401; Con token pero rol user -> 403
 router.post('/', authenticate, soloAdmin, controller.create);
-router.put('/:id', authenticate, soloAdmin, validateIdParam, controller.update);
+// Editar y borrar: admin o quien propuso el recuerdo. El permiso se revisa en el caso de uso (403 si no es ninguno)
+router.put('/:id', authenticate, validateIdParam, controller.update);
 // POST /api/experiencias/:id/imagen -> multipart/form-data con el campo "image" (máx. 5 MB)
-router.post('/:id/imagen', authenticate, soloAdmin, validateIdParam, uploadImage, controller.uploadImage);
-// Admin o quien propuso el recuerdo: el permiso se revisa en el caso de uso (403 si no es ninguno)
+router.post('/:id/imagen', authenticate, validateIdParam, uploadImage, controller.uploadImage);
 router.delete('/:id', authenticate, validateIdParam, controller.delete);
 
 export default router;
