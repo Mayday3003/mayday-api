@@ -26,7 +26,7 @@ router.get('/:id', validateIdParam, controller.getById);
 router.post('/', authenticate, soloAdmin, controller.create);
 // Editar y borrar: admin o quien propuso el recuerdo. El permiso se revisa en el caso de uso (403 si no es ninguno)
 router.put('/:id', authenticate, validateIdParam, controller.update);
-// POST /api/experiencias/:id/imagen -> multipart/form-data con el campo "image" (máx. 5 MB)
+// POST /api/experiencias/:id/imagen -> multipart/form-data con el campo "image" (máx. 10 MB)
 router.post('/:id/imagen', authenticate, validateIdParam, uploadImage, controller.uploadImage);
 router.delete('/:id', authenticate, validateIdParam, controller.delete);
 

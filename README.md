@@ -71,7 +71,7 @@ Todas las rutas empiezan por `/api`. Los errores responden `{ error: { message, 
 
 Query de `GET /experiencias`, combinables: `page` (≥ 1), `limit` (1–50), `search` (título o descripción), `type` (`viaje`, `situacion`, `experiencia`), `participant`, `from` y `to` (`AAAA-MM-DD`).
 
-La imagen se envía como `multipart/form-data` en el campo `image` (JPG, PNG, WEBP o GIF, máximo 5 MB).
+La imagen se envía como `multipart/form-data` en el campo `image` (JPG, PNG, WEBP o GIF, máximo 10 MB).
 
 ### Comentarios (interacción)
 | Método | Ruta | Acceso | Respuestas |

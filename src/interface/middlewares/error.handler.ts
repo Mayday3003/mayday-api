@@ -38,7 +38,7 @@ export function errorHandler(
 
   // Archivo demasiado grande u otros errores de multer
   if (err instanceof multer.MulterError) {
-    const message = err.code === 'LIMIT_FILE_SIZE' ? 'La imagen no puede superar 5 MB' : 'Archivo inválido';
+    const message = err.code === 'LIMIT_FILE_SIZE' ? 'La imagen no puede superar 10 MB' : 'Archivo inválido';
     res.status(400).json({
       error: {
         message,
