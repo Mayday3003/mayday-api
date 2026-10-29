@@ -1,4 +1,4 @@
-import { IsArray, IsDateString, IsIn, IsOptional, IsString, Length, MinLength } from 'class-validator';
+import { IsArray, IsDateString, IsIn, IsOptional, IsString, Length, MaxLength, MinLength } from 'class-validator';
 import type { CreateExperienceDto, ExperienceCategory, UpdateExperienceDto } from '../../domain/models/Experience.js';
 import { validateOrThrow } from './validate.js';
 
@@ -44,9 +44,10 @@ export class CreateExperienceBodyDto implements CreateExperienceDto {
 }
 
 export class UpdateExperienceBodyDto implements UpdateExperienceDto {
+  // Al editar, título y descripción pueden quedar vacíos (las propuestas los permiten)
   @IsOptional()
   @IsString({ message: 'El título debe ser texto' })
-  @Length(3, 150, { message: 'El título debe tener entre 3 y 150 caracteres' })
+  @MaxLength(150, { message: 'El título no puede pasar de 150 caracteres' })
   title?: string;
 
   @IsOptional()
@@ -55,7 +56,6 @@ export class UpdateExperienceBodyDto implements UpdateExperienceDto {
 
   @IsOptional()
   @IsString({ message: 'La descripción debe ser texto' })
-  @MinLength(10, { message: 'La descripción debe tener al menos 10 caracteres' })
   description?: string;
 
   @IsOptional()
